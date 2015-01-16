@@ -54,39 +54,6 @@ Runs in nodejs, or iojs, installed via npm:
 npm install adapt-pkg-main
 ```
 
-## Suggested loader configuration setup
-
-This section uses an AMD loader, requirejs, for illustration, but the general config approach should be adaptable to other front end module loaders that support dynamic loading.
-
-Ideally, your project is set up like so:
-
-* index.html
-* app.js (the script that has the loader config)
-* app/ (app-specific modules go in here)
-  * main.js (the main app module)
-* my_packages/ (holds third party module packages)
-
-
-The `my_packages` directory might be called `bower_components` or `node_modules` or something else in your project. The main point is that a package manager handles installations into that folder.
-
-The app.js would look like this:
-
-```javascript
-requirejs.config({
-    baseUrl: 'my_packages',
-    paths: {
-        app: '../app'
-    }
-});
-
-// Start loading the main app module.
-requirejs(['app/main']);
-```
-
-From then on, for any of your app modules in `app/` they relative module IDs to refer to each other. Use `adapt-pkg-main` to handle writing out the adapter modules in `my_packages` after new dependency installs so that this config block should hopefully not need to be touched again to put in path information.
-
-The [volojs/create-template](https://github.com/volojs/create-template) is a template project that has this sort of directory config if you want to see a fuller project example. That project uses `lib` instead of `my_packages`, and does not use `adapt-pkg-name` directly, just shows how to set up the initial file layout and config.
-
 ## API
 
 adapt-pkg-main can be used in script as a require()'d module in another node module, or on the command line.
@@ -149,5 +116,38 @@ Where dirPath is the directory path to scan. See the Script API section for more
 ```
 node_modules/.bin/adapt-pkg-main bower_components configFileNames=bower.json,package.json adapterText="something that uses {id}"
 ```
+
+## Suggested loader configuration setup
+
+This section uses an AMD loader, requirejs, for illustration, but the general config approach should be adaptable to other front end module loaders that support dynamic loading.
+
+Ideally, your project is set up like so:
+
+* index.html
+* app.js (the script that has the loader config)
+* app/ (app-specific modules go in here)
+  * main.js (the main app module)
+* my_packages/ (holds third party module packages)
+
+
+The `my_packages` directory might be called `bower_components` or `node_modules` or something else in your project. The main point is that a package manager handles installations into that folder.
+
+The app.js would look like this:
+
+```javascript
+requirejs.config({
+    baseUrl: 'my_packages',
+    paths: {
+        app: '../app'
+    }
+});
+
+// Start loading the main app module.
+requirejs(['app/main']);
+```
+
+From then on, for any of your app modules in `app/` they relative module IDs to refer to each other. Use `adapt-pkg-main` to handle writing out the adapter modules in `my_packages` after new dependency installs so that this config block should hopefully not need to be touched again to put in path information.
+
+The [volojs/create-template](https://github.com/volojs/create-template) is a template project that has this sort of directory config if you want to see a fuller project example. That project uses `lib` instead of `my_packages`, and does not use `adapt-pkg-name` directly, just shows how to set up the initial file layout and config.
 
 
