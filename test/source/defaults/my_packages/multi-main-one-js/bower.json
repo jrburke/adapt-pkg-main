@@ -1,0 +1,7 @@
+{
+  "main": [
+    "something.css",
+    "lib/main.js",
+    "another.css"
+  ]
+}

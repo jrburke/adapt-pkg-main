@@ -14,6 +14,7 @@ if (!dir) {
   process.exit(0);
 }
 
+// Convert name=value command args into options[name]: value args
 optArgs.forEach(function(optArg) {
   var parts = optArg.split('='),
       key = parts[0],
