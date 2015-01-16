@@ -1,0 +1,25 @@
+{
+  "name": "adapt-pkg-main",
+  "version": "1.0.0",
+  "description": "Creates a package.js sibling to package directory for easier front end module loader consumption",
+  "main": "index.js",
+  "bin": {
+    "adapt-pkg-main": "./bin/adapt-pkg-main.js"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jrburke/adapt-pkg-main.git"
+  },
+  "author": "James Burke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jrburke/adapt-pkg-main/issues"
+  },
+  "homepage": "https://github.com/jrburke/adapt-pkg-main",
+  "devDependencies": {
+    "mocha": "^2.1.0"
+  }
+}
