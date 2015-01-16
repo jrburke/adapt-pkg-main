@@ -1,6 +1,6 @@
 ## adapt-pkg-main
 
-This module helps consume modules installed as package directories without needing to configure a module loader to load them.
+adapt-pkg-main helps consume modules installed as package directories without needing to configure a module loader to load them.
 
 It is useful for AMD and likely ES6 module projects that do not want to have a loader config entry for every dependency.
 
@@ -23,7 +23,7 @@ The loader has a config API where you can tell it the main module and location f
 **Cons**:
 
 * Leads to larger config blocks, some of which may not be needed on initial load.
-* Requires modifying the app file that has the config in it.
+* Requires modifying an app file that has the config in it. Could cause some mismatches in code style.
 
 ### Main Adapter Writing
 
@@ -31,11 +31,11 @@ When installing the `packageName` directory, also write out a `packageName.js` f
 
 Then, when the module loader is asked to load 'packageName', this adapter module is loaded, which then just loads and exports the main module inside the 'packageName' directory.
 
-This module takes the Main Adapter Writing approach. Ideally package managers would allow this natively as an install option, particularly once looking forward to ES 6 modules.
+adapt-pkg-main takes the Main Adapter Writing approach. Ideally package managers would allow this natively as an install option, particularly once ES6 modules become more of a reality.
 
-In the meantime, you can use this module to do the work, as something you trigger after using your package manager, as a post install step.
+In the meantime, you can use adapt-pkg-main to do the work, something you trigger after using your package manager, as a post install step.
 
-You do not need to use this module for every browser load of your project, just whenever there is change to the installed dependencies for your project.
+You do not need to use adapt-pkg-main for every browser load of your project, just whenever there is a change to the installed dependencies for your project.
 
 **Pros**:
 
@@ -48,15 +48,11 @@ You do not need to use this module for every browser load of your project, just 
 
 ## Installation
 
-Runs in node, installed via npm:
+Runs in nodejs, or iojs, installed via npm:
 
 ```
 npm install adapt-pkg-main
 ```
-
-## When to run it
-
-Run this module as part of your install process
 
 ## Suggested loader configuration setup
 
@@ -65,13 +61,13 @@ This section uses an AMD loader, requirejs, for illustration, but the general co
 Ideally, your project is set up like so:
 
 * index.html
-* app.js (the script that has the loader config
-* app/
+* app.js (the script that has the loader config)
+* app/ (app-specific modules go in here)
   * main.js (the main app module)
 * my_packages/ (holds third party module packages)
 
 
-The `my_packages` directory might be called `bower_components` or `node_modules` or something else. The main point is that a package manager handles installations into that folder.
+The `my_packages` directory might be called `bower_components` or `node_modules` or something else in your project. The main point is that a package manager handles installations into that folder.
 
 The app.js would look like this:
 
@@ -83,18 +79,17 @@ requirejs.config({
     }
 });
 
-// Start loading the main app file. Put all of
-// your application logic in there.
+// Start loading the main app module.
 requirejs(['app/main']);
 ```
 
 From then on, for any of your app modules in `app/` they relative module IDs to refer to each other. Use `adapt-pkg-main` to handle writing out the adapter modules in `my_packages` after new dependency installs so that this config block should hopefully not need to be touched again to put in path information.
 
-The [volojs/create-template](https://github.com/volojs/create-template) is a template project that has this sort of directory an config if you want to see a fuller project example. That project uses `lib` instead of `my_packages`, and does not use `adapt-pkg-name` directly, just shows how to set the initial file layout and config.
+The [volojs/create-template](https://github.com/volojs/create-template) is a template project that has this sort of directory config if you want to see a fuller project example. That project uses `lib` instead of `my_packages`, and does not use `adapt-pkg-name` directly, just shows how to set up the initial file layout and config.
 
 ## API
 
-This module can be used in script as require()'d module in another node module, or on the command line.
+This module can be used in script as a require()'d module in another node module, or on the command line.
 
 The script API is best to use if you have an existing node-based toolchain for builds and installs, like grunt or gulp. The command line API is best to use if you just want a quick command to run as part of a Makefile or shell script setup.
 
@@ -125,6 +120,8 @@ If the directory structure is like this:
 
 Then `require('adapt-pkg-main')('my_packages')` will scan alpha and beta for "main" package config, looking first for package.json, and if not there then bower.json, and a `my_packages/alpha.js` and `my_packages/beta.js` will be generated in AMD format.
 
+### Options
+
 The options object is optional, and can have the following properties:
 
 **configFileNames**: An array of JSON-formated file names to check for a "main" property in each package. The default is `['package.json', 'bower.json']`. The order of the entries is the order this module uses to find a "main" entry.
@@ -137,8 +134,7 @@ define(['./{id}'], function(m) { return m; });
 
 The `{id}` part is replaced by this module with the name of the package's main module ID.
 
-If wanting to write out the adapters in Node's module format, you can pass the string `module.exports = require('./{id}');`
-```
+If wanting to write out the adapters in Node's module format, you can pass the string `module.exports = require('./{id}');`.
 
 ### Command line API
 
