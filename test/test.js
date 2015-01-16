@@ -46,7 +46,7 @@ function recursiveCopy(source, dest) {
 
 function assertMatch(id, filePath, template) {
   var text = fs.readFileSync(filePath, 'utf8');
-  assert(template.replace(idRegExp, id).trim(), text.trim());
+  assert.equal(template.replace(idRegExp, id).trim(), text.trim());
 }
 
 function assertDefaultMatch(id, filePath) {
@@ -81,7 +81,10 @@ describe('adapt-pkg-main', function() {
     assertDefaultMatch('no-config-just-js/sample',
                        path.join(baseDir, 'no-config-just-js.js'));
 
-    assert(true, !exists(path.join(baseDir, 'gamma.js')));
+    assertDefaultMatch('relative-main-id/lib/main',
+                       path.join(baseDir, 'relative-main-id.js'));
+
+    assert.equal(true, !exists(path.join(baseDir, 'gamma.js')));
   });
 
   it('adapterText: cjs', function() {
@@ -98,7 +101,7 @@ describe('adapt-pkg-main', function() {
       configFileNames: ['bower.json', 'package.json']
     });
 
-    assertCjsMatch('alpha/incorrect', path.join(baseDir, 'alpha.js'));
+    assertDefaultMatch('alpha/incorrect', path.join(baseDir, 'alpha.js'));
   });
 
 });

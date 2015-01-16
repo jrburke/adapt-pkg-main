@@ -2,6 +2,7 @@
 var fs = require('fs'),
     path = require('path'),
     exists = fs.existsSync || path.existsSync,
+    relativeSegmentRegExp = /^\.\//,
     jsExtRegExp = /\.js$/,
     idRegExp = /\{id\}/g,
     badExtensions = {
@@ -125,6 +126,9 @@ module.exports = function(dir, opts) {
                       ' does not exist, skipping.');
         return;
       }
+
+      // Remove any trailing relative path segment, just to make it prettier.
+      main = main.replace(relativeSegmentRegExp, '');
 
       // Remove any trailing .js extension, since it is not needed for
       // module IDs, and mixes up the separation of IDs from paths.
