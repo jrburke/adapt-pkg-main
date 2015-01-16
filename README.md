@@ -89,7 +89,7 @@ The [volojs/create-template](https://github.com/volojs/create-template) is a tem
 
 ## API
 
-This module can be used in script as a require()'d module in another node module, or on the command line.
+adapt-pkg-main can be used in script as a require()'d module in another node module, or on the command line.
 
 The script API is best to use if you have an existing node-based toolchain for builds and installs, like grunt or gulp. The command line API is best to use if you just want a quick command to run as part of a Makefile or shell script setup.
 
@@ -106,9 +106,9 @@ require('adapt-pkg-main')(dirPath, {
 
 **dirPath** is the directory path, as a string, to scan for packages. This is likely the directory your package manager has installed dependencies, like `bower_components` or `node_modules`. It should contain directories which are the actual packages of JS code that have been installed by a package manager.
 
-Only one level of directory scanning is done by this module. It does not try to recursively scan for other directories containing module packages, like nested `node_modules`.
+adapt-pkg-main only does one level of directory scanning. It does not try to recursively scan for other directories containing module packages, like nested `node_modules`.
 
-For those nested cases, do the subdirectory scan outside of this module, and call this module with each directory (although that case likely entails setting up some other loader config, like the [requirejs map config](http://requirejs.org/docs/api.html#config-map) manually or using some other tool for that config).
+For those nested cases, do the subdirectory scan outside of adapt-pkg-main, and call adapt-pkg-main with each directory (although that case likely entails setting up some other loader config, like the [requirejs map config](http://requirejs.org/docs/api.html#config-map) manually or using some other tool for that config).
 
 ### Example
 
@@ -124,7 +124,7 @@ Then `require('adapt-pkg-main')('my_packages')` will scan alpha and beta for "ma
 
 The options object is optional, and can have the following properties:
 
-**configFileNames**: An array of JSON-formated file names to check for a "main" property in each package. The default is `['package.json', 'bower.json']`. The order of the entries is the order this module uses to find a "main" entry.
+**configFileNames**: An array of JSON-formated file names to check for a "main" property in each package. The default is `['package.json', 'bower.json']`. The order of the entries is the order adapt-pkg-main uses to find a "main" entry.
 
 **adapterText**: A string that is used for the module body of the adapter. The default is:
 
@@ -132,7 +132,7 @@ The options object is optional, and can have the following properties:
 define(['./{id}'], function(m) { return m; });
 ````
 
-The `{id}` part is replaced by this module with the name of the package's main module ID.
+The `{id}` part is replaced by adapt-pkg-main with the name of the package's main module ID.
 
 If wanting to write out the adapters in Node's module format, you can pass the string `module.exports = require('./{id}');`.
 
