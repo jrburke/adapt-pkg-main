@@ -16,18 +16,19 @@ if (!dir) {
 
 // Convert name=value command args into options[name]: value args
 optArgs.forEach(function(optArg) {
-  var parts = optArg.split('='),
-      key = parts[0],
-      value = parts[1];
+  var index = optArg.indexOf('=');
 
-  if (parts.length !== 2) {
+  if (index === -1) {
     throw new Error('Malformed option argument: ' + optArg);
   }
+
+  var key = optArg.substring(0, index),
+      value = optArg.substring(index + 1);
 
   if (key === 'configFileNames') {
     opts[key] = value.split(',');
   } else {
-    opts[key] = parts[value];
+    opts[key] = value;
   }
 });
 
