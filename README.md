@@ -58,7 +58,7 @@ npm install adapt-pkg-main
 
 adapt-pkg-main can be used in script as a require()'d module in another node module, or on the command line.
 
-The script API is best to use if you have an existing node-based toolchain for builds and installs, like grunt or gulp. The command line API is best to use if you just want a quick command to run as part of a Makefile or shell script setup.
+The script API is best to use if you have an existing node-based toolchain for builds and installs, like grunt or gulp. The command line API is best to use if you just want a command to run as part of a Makefile or shell script setup.
 
 ### Script API
 
