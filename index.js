@@ -66,76 +66,83 @@ module.exports = function(dir, opts) {
   if (!Array.isArray(opts.configFileNames) || !opts.configFileNames.length) {
     throw new Error('configFileNames needs to be a non-zero array');
   }
+  if ('include' in opts && !Array.isArray(opts.include)) {
+    throw new Error('include needs to be an array');
+  }
 
-  fs.readdirSync(dir).forEach(function(pkgName) {
-    var pkgPath = path.join(dir, pkgName);
-    if (!fs.statSync(pkgPath).isFile()) {
-      var main,
-          configFile = getConfigPath(pkgPath, opts.configFileNames);
+  fs.readdirSync(dir)
+    .filter(function(pkgName) {
+      return (!('include' in opts)) || opts.include.indexOf(pkgName) !== -1;
+    })
+    .forEach(function(pkgName) {
+      var pkgPath = path.join(dir, pkgName);
+      if (!fs.statSync(pkgPath).isFile()) {
+        var main,
+            configFile = getConfigPath(pkgPath, opts.configFileNames);
 
-      if (configFile) {
-        var contents = fs.readFileSync(configFile, 'utf8');
+        if (configFile) {
+          var contents = fs.readFileSync(configFile, 'utf8');
 
-        if (contents) {
-          var config = JSON.parse(contents);
+          if (contents) {
+            var config = JSON.parse(contents);
 
-          main = config.main;
+            main = config.main;
 
-          if (Array.isArray(main)) {
-            // A bower thing. Need to find main value.
-            if (main.length === 0) {
-              main = null;
-            } else if (main.length === 1) {
-              main = main[0];
-            } else {
-              main = findOneJsInArray(main);
+            if (Array.isArray(main)) {
+              // A bower thing. Need to find main value.
+              if (main.length === 0) {
+                main = null;
+              } else if (main.length === 1) {
+                main = main[0];
+              } else {
+                main = findOneJsInArray(main);
+              }
             }
           }
+        } else {
+          // No config files.
+          // May not have a main, but the the directory just has one JS
+          // file in it, then use that as the main.
+          main = findOneJsInArray(fs.readdirSync(pkgPath));
         }
-      } else {
-        // No config files.
-        // May not have a main, but the the directory just has one JS
-        // file in it, then use that as the main.
-        main = findOneJsInArray(fs.readdirSync(pkgPath));
+
+
+        if (!main) {
+          return;
+        }
+
+        // Ignore main values that may not be JS files. Cannot just blindly
+        // rely on the value of whatever is past the last dot and discard if
+        // not JS, since some front end library ecosystems, like jQuery
+        // plugins, use dots to segment parts of their names. So going with
+        // an exclusion list instead.
+        var ext = path.extname(main);
+        if (ext.indexOf('.') === 0) {
+          ext = ext.substring(1);
+        }
+
+        if (badExtensions.hasOwnProperty(ext)) {
+          return;
+        }
+
+        // Confirm the main file actually exists.
+        var mainPath = path.join(pkgPath, main);
+        if (!exists(mainPath) && !exists(mainPath + '.js')) {
+          console.error('WARNING: ' +
+                        mainPath +
+                        ' does not exist, skipping.');
+          return;
+        }
+
+        // Remove any trailing relative path segment, just to make it prettier.
+        main = main.replace(relativeSegmentRegExp, '');
+
+        // Remove any trailing .js extension, since it is not needed for
+        // module IDs, and mixes up the separation of IDs from paths.
+        main = main.replace(jsExtRegExp, '');
+
+        var text = opts.adapterText.replace(idRegExp, pkgName + '/' + main);
+        fs.writeFileSync(path.join(dir, pkgName + '.js'), text, 'utf8');
       }
-
-
-      if (!main) {
-        return;
-      }
-
-      // Ignore main values that may not be JS files. Cannot just blindly
-      // rely on the value of whatever is past the last dot and discard if
-      // not JS, since some front end library ecosystems, like jQuery
-      // plugins, use dots to segment parts of their names. So going with
-      // an exclusion list instead.
-      var ext = path.extname(main);
-      if (ext.indexOf('.') === 0) {
-        ext = ext.substring(1);
-      }
-
-      if (badExtensions.hasOwnProperty(ext)) {
-        return;
-      }
-
-      // Confirm the main file actually exists.
-      var mainPath = path.join(pkgPath, main);
-      if (!exists(mainPath) && !exists(mainPath + '.js')) {
-        console.error('WARNING: ' +
-                      mainPath +
-                      ' does not exist, skipping.');
-        return;
-      }
-
-      // Remove any trailing relative path segment, just to make it prettier.
-      main = main.replace(relativeSegmentRegExp, '');
-
-      // Remove any trailing .js extension, since it is not needed for
-      // module IDs, and mixes up the separation of IDs from paths.
-      main = main.replace(jsExtRegExp, '');
-
-      var text = opts.adapterText.replace(idRegExp, pkgName + '/' + main);
-      fs.writeFileSync(path.join(dir, pkgName + '.js'), text, 'utf8');
-    }
-  });
+    });
 };

@@ -25,7 +25,7 @@ optArgs.forEach(function(optArg) {
   var key = optArg.substring(0, index),
       value = optArg.substring(index + 1);
 
-  if (key === 'configFileNames') {
+  if (key === 'configFileNames' || key === 'include') {
     opts[key] = value.split(',');
   } else {
     opts[key] = value;
