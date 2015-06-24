@@ -63,11 +63,11 @@ function resetOutput() {
   recursiveCopy(path.join(__dirname, 'source'), outputPath);
 }
 
-beforeEach(resetOutput);
-
 // Start the tests
 describe('adapt-pkg-main', function() {
   var baseDir = path.join(__dirname, 'output', 'defaults', 'my_packages');
+
+  beforeEach(resetOutput);
 
   it('defaults', function() {
     adaptPkgMain(baseDir);
@@ -104,4 +104,31 @@ describe('adapt-pkg-main', function() {
     assertDefaultMatch('alpha/incorrect', path.join(baseDir, 'alpha.js'));
   });
 
+  it('include opt', function() {
+    adaptPkgMain(baseDir, { include: ['alpha', 'relative-main-id'] });
+
+    [
+      'alpha',
+      'relative-main-id'
+    ].forEach(function(pkgName) {
+      assert.equal(
+        exists(path.join(baseDir, pkgName + '.js')),
+        true,
+        pkgName + ' should be included'
+      );
+    });
+
+    [
+      'beta',
+      'gamma',
+      'multi-main-one',
+      'no-config-just-js'
+    ].forEach(function(pkgName) {
+      assert.equal(
+        exists(path.join(baseDir, pkgName + '.js')),
+        false,
+        pkgName + ' should not be included'
+      );
+    });
+  });
 });
