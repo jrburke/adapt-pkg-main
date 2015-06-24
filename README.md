@@ -93,6 +93,8 @@ The options object is optional, and can have the following properties:
 
 **configFileNames**: An array of JSON-formated file names to check for a "main" property in each package. The default is `['package.json', 'bower.json']`. The order of the entries is the order adapt-pkg-main uses to find a "main" entry.
 
+**include**: An array of top level directory names in node_modules. Instead of creating adapters for all directories in node_modules, this option will only adapt the directories listed in the `includes` array. This is useful when the node_modules includes libraries used in node, and there are only a few of them you want to use in a `baseUrl + moduleId + '.js'` style of loader.
+
 **adapterText**: A string that is used for the module body of the adapter. The default is:
 
 ```javascript
@@ -111,10 +113,10 @@ If this is locally installed in a project's node_modules directory, it can be ru
 node_modules/.bin/adapt-pkg-main dirPath
 ```
 
-Where dirPath is the directory path to scan. See the Script API section for more details on the arguments. The options object properties can be passed via `name=value` strings, and the array used for configFileNames can just be a comma separate string. Example:
+Where `dirPath` is the directory path to scan. See the Script API section for more details on the arguments. The options object properties can be passed via `name=value` strings, and the arrays used for `include` and `configFileNames` can just be a comma separated string. Example:
 
 ```
-node_modules/.bin/adapt-pkg-main bower_components configFileNames=bower.json,package.json adapterText="something that uses {id}"
+node_modules/.bin/adapt-pkg-main bower_components configFileNames=bower.json,package.json include=foo,bar adapterText="something that uses {id}"
 ```
 
 ## Suggested loader configuration setup
@@ -149,5 +151,3 @@ requirejs(['app/main']);
 From then on, for any of your app modules in `app/` they relative module IDs to refer to each other. Use `adapt-pkg-main` to handle writing out the adapter modules in `my_packages` after new dependency installs so that this config block should hopefully not need to be touched again to put in path information.
 
 The [volojs/create-template](https://github.com/volojs/create-template) is a template project that has this sort of directory config if you want to see a fuller project example. That project uses `lib` instead of `my_packages`, and does not use `adapt-pkg-name` directly, just shows how to set up the initial file layout and config.
-
-
